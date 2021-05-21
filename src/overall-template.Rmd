@@ -113,7 +113,7 @@ kable(multi_stage_wide_pos, format = "html") %>%
   kable_styling() %>%
   kableExtra::scroll_box(width = "100%")
 ```
-```{r}
+```{r message=FALSE}
 
 overall_long_gap_top10 <- multi_overall_wide_gap_top10 %>%
                             gather(key ="Stage",
@@ -144,7 +144,7 @@ multi_stage_long_gap = generate_spark_bar(multi_stage_wide_gap) %>%
 ```
 
 
-```{r}
+```{r warning=FALSE}
 # Stage position chart
 #top10_codes = multi_stage_wide_pos$code
 multi_overall_wide_pos_ = multi_overall_wide_pos  %>%
@@ -176,7 +176,7 @@ multi_overall_wide_pos_$stage_poschart = gt_stage_pos_plots
 ```
 
 
-```{r}
+```{r warning=FALSE, message=FALSE}
 #position changes
 pos_codes = multi_overall_wide_pos_$code
 
@@ -185,7 +185,7 @@ pos_diffs = multi_overall_wide_pos_
 if (length(stage_list) > 1) {
 pos_diffs = pos_diffs %>% 
                   select(-code) %>%
-                  coldiffs(all_of(stage_codes),firstcol=0)
+                  coldiffs(all_of(stage_codes), firstcol=0)
   pos_diffs$code = pos_codes
   
   # Reorder the columns by moving last column to first
