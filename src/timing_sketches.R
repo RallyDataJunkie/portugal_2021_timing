@@ -105,9 +105,10 @@ color_tile2 <- function (...) {
           `border-radius` = "4px",
           `font.weight` = ifelse(x==-1e-9,"normal",
                                  ifelse(abs(x)> 0.3*max(x), "bold", "normal")),
-          color = ifelse(x==-1e-9,'black',ifelse(abs(x)> 0.3*max(x),'white',
+          color = ifelse(x==-1e-9,'lightgrey', ifelse(abs(x)> 0.3*max(x), 'white',
                                          ifelse(x==0,'lightgrey','black'))),
-          `background-color` = ifelse(x==-1e-9,'black',csscolor(matrix(as.integer(colorRamp(...)(xnormalize(as.numeric(x)))), 
+          `background-color` = ifelse(x==-1e-9,'lightgrey',
+                                      csscolor(matrix(as.integer(colorRamp(...)(xnormalize(as.numeric(x)))), 
                                                       byrow=TRUE, 
                                                       dimnames=list(c("green","red","blue"), NULL),
                                                       nrow=3)))
