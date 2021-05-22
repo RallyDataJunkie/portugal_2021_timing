@@ -424,6 +424,7 @@ gap-to-overall-leader-at-each-stage-end
 stage-position-history
 rally-sparkline-summary
 stage-times
+loop-reports
 ss1-results
 stage-ss1-splits-analysis
 split-locations
