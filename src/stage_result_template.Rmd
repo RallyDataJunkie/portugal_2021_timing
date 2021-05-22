@@ -1,3 +1,7 @@
+```{r}
+cat(paste("Enter stage_result_template", stage_code),
+    file=logFile, sep='\n')
+```
 # `r stage_code` Results
 
 ```{r}
@@ -20,6 +24,7 @@ top10_stage_times = stage_times %>%
                       # A minor optimisation step to 
                       # limit the amount of merging
                       arrange(position) %>%
+                      filter(entryId %in% wrc_entries) %>%
                       head(10) %>%
                       # Merge in the entries data
                       merge(cars, by='entryId')  %>%
@@ -39,6 +44,12 @@ top10_stage_times = stage_times %>%
                              Code = code,
                              `Time (s)` = TimeInS,
                              Gap = gap, Diff = diff)
+
+# Optionally, re-rank by group
+if (use_group_rank) {
+  top10_stage_times$overall_stage_pos = top10_stage_times$Pos
+  top10_stage_times$Pos = rank(top10_stage_times$overall_stage_pos)
+}
 ```
 
 ```{r}
@@ -86,6 +97,7 @@ caption = paste0('Top 10, ', stage_info_$code,
 
 top10_stage_times %>% 
   filter(!is.na(Gap)) %>%
+  select(-overall_stage_pos) %>%
   formattable(list(Gap = color_bar2("#FA614B66"),
                    Diff = color_tile("#DeF7E9","#71CA97"),
                    entryId=FALSE), caption=caption)
@@ -94,7 +106,11 @@ top10_stage_times %>%
 
 ```{r message=FALSE, echo=FALSE, error=FALSE, warning=FALSE, results='asis'}
 #omit_stage_splits=c("SS1")
-if (!(stage_code %in% c())){ #omit_stage_splits)) {
+
+# Handle stages without a split
+stage_splits_exist = length(get_splits(eventId, stageId)$splitPoints)
+
+if (!(stage_code %in% c()) && stage_splits_exist){ #omit_stage_splits)) {
     template="test-template.Rmd"
     #template="empty_template.Rmd"
     src = knit_expand(template)
@@ -105,31 +121,43 @@ if (!(stage_code %in% c())){ #omit_stage_splits)) {
 
 ```
 
-
 ```{r message=FALSE, echo=FALSE, error=FALSE, warning=FALSE, results='asis'}
-rebase_cols = c('Time (s)', 'Gap')
+# Handle rebase split times for each driver
 
-for (driverEntryId in wrc_entries){
-  #driverEntryId=22431
-  driverCode = cars[cars$entryId==driverEntryId,'code']
-
-  # This section is broken
-  template = "driver_stage_template.Rmd"
-  #template="empty_template.Rmd"
-  src = knit_expand(template)
-  cat(knit_child(text=src,
-                   options = list(echo=FALSE, warning=FALSE, error=FALSE),
-                   quiet=TRUE))
+if (stage_splits_exist) {
   
-  if (!(stage_code %in% c())){ #omit_stage_splits)) {
-    template="driver_template.Rmd"
+  rebase_cols = c('Time (s)', 'Gap')
+
+  for (driverEntryId in wrc_entries){
+    #driverEntryId=22431
+    driverCode = cars[cars$entryId==driverEntryId,'code']
+  
+    # This section is broken
+    template = "driver_stage_template.Rmd"
     #template="empty_template.Rmd"
     src = knit_expand(template)
     cat(knit_child(text=src,
-                   options = list(echo=FALSE, warning=FALSE, error=FALSE),
-                   quiet=TRUE))
+                     options = list(echo=FALSE, warning=FALSE, error=FALSE),
+                     quiet=TRUE))
+    
+    if (!(stage_code %in% c())){ #omit_stage_splits)) {
+      template="driver_template.Rmd"
+      #template="empty_template.Rmd"
+      src = knit_expand(template)
+      cat(knit_child(text=src,
+                     options = list(echo=FALSE, warning=FALSE, error=FALSE),
+                     quiet=TRUE))
+    }
   }
+  
 }
 
+
+
+```
+
+```{r}
+cat(paste("Leave stage_result_template", stage_code),
+    file=logFile, sep='\n')
 ```
 

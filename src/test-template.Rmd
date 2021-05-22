@@ -1,3 +1,8 @@
+```{r}
+cat(paste("test-template IN: ",stage_code),
+    file=logFile, append=TRUE, sep = "\n")
+```
+
 ## Stage `r stage_code` Splits Analysis
 
 Reports on splits
@@ -6,8 +11,10 @@ Reports on splits
 #library(formattable)
 
 #stage_code = 'SS6'
+#stageId = stage_list_codes[1]
 
 splits = get_splits(eventId, stageId)
+
 splits_locations = splits$splitPoints %>% arrange(number)
 splits_list = splits_locations$splitPointId
 splits_locations$splitname = sapply(splits_locations$splitPointId,
@@ -31,19 +38,33 @@ full_split_distances = c(split_distances, stage_dist-sum(split_distances))
 names(full_split_distances) = split_names
 ```
 
-
-
 ```{r echo=FALSE, message=FALSE, warning=FALSE,}
 full_splits_wide = get_splits_wide(splits, wrc_entries) %>%
                       widen_splits_stage_times(stage_times) %>%
+                      filter(entryId %in% wrc_entries) %>%
                       map_split_codes(splits_list) %>% 
                       map_driver_names(cars)  %>%
-                      arrange(position) %>%
-              # Filter out any driver with an excessive delta
-              #https://dplyr.tidyverse.org/reference/filter_all.html
-                      #filter_at(vars(starts_with("split_")),
-                      #          all_vars(abs(.) <20))
-                      filter(diffFirstMs<30000)
+                      arrange(position)
+
+if (use_group_rank) {
+  group_rebase_id = full_splits_wide$code[1]
+  full_splits_wide = full_splits_wide %>%
+                            rebase(group_rebase_id, 'diffFirstMs', 
+                                   id_col='code')
+}
+
+#kable(full_splits_wide)
+```
+
+```{r}
+# Filter out any driver with an excessive delta
+#https://dplyr.tidyverse.org/reference/filter_all.html
+#filter_at(vars(starts_with("split_")),
+#          all_vars(abs(.) <20))
+
+# TO DO - would it make more sense to cutoff from a large gap?
+if (!(exists("cutoff_delta"))) cutoff_delta = 30000
+full_splits_wide = full_splits_wide %>% filter(diffFirstMs<cutoff_delta)
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
@@ -84,7 +105,6 @@ stage_split_results = full_splits_wide %>%
 
 kable(stage_split_results)
 ```
-
 
 ### Split Time Rankings
 
@@ -259,3 +279,7 @@ ggplot(section_pace_long,
     geom_boxplot(aes(group=distance)) +theme_bw() +ggtitle(paste0(stage_code, ": pace on each split,"))
 ```
 
+```{r}
+cat(paste("test-template OUT: ",stage_code),
+    file=logFile, append=TRUE, sep = "\n")
+```
