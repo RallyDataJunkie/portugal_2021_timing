@@ -97,17 +97,21 @@ xnormalize = function(x){
 
 color_tile2 <- function (...) {
   formatter("span", style = function(x) {
+    # Handle NA
+    x = ifelse(is.na(x), -1e-9, x)
     style(display = "block",
           'text-align' = 'center',
           padding = "0 4px", 
           `border-radius` = "4px",
-          `font.weight` = ifelse(abs(x)> 0.3*max(x), "bold", "normal"),
-          color = ifelse(abs(x)> 0.3*max(x),'white',
-                         ifelse(x==0,'lightgrey','black')),
-          `background-color` = csscolor(matrix(as.integer(colorRamp(...)(xnormalize(as.numeric(x)))), 
-                                               byrow=TRUE, 
-                                               dimnames=list(c("green","red","blue"), NULL),
-                                               nrow=3)))
+          `font.weight` = ifelse(x==-1e-9,"normal",
+                                 ifelse(abs(x)> 0.3*max(x), "bold", "normal")),
+          color = ifelse(x==-1e-9,'black',ifelse(abs(x)> 0.3*max(x),'white',
+                                         ifelse(x==0,'lightgrey','black'))),
+          `background-color` = ifelse(x==-1e-9,'black',csscolor(matrix(as.integer(colorRamp(...)(xnormalize(as.numeric(x)))), 
+                                                      byrow=TRUE, 
+                                                      dimnames=list(c("green","red","blue"), NULL),
+                                                      nrow=3)))
+          )
   })}
 
 
