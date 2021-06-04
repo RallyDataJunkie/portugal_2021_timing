@@ -38,6 +38,7 @@ top10_stage_times = stage_times %>%
                       # The merge may upset the row order
                       # so reset the order again
                       arrange(position) %>%
+                      # TO DO  - arrange using na.last=TRUE ?
                       # Improve column names by renaming them
                       rename(Pos=position,
                              Car = identifier,
@@ -139,8 +140,8 @@ if (stage_splits_exist) {
     cat(knit_child(text=src,
                      options = list(echo=FALSE, warning=FALSE, error=FALSE),
                      quiet=TRUE))
-    
-    if (!(stage_code %in% c())){ #omit_stage_splits)) {
+    # driver_blank set in driver_stage_template.Rmd
+    if (!(stage_code %in% c()) && !(driver_blank)){ #omit_stage_splits)) {
       template="driver_template.Rmd"
       #template="empty_template.Rmd"
       src = knit_expand(template)

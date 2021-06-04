@@ -58,6 +58,8 @@ use_group_rank = TRUE
 
 wrc = cars %>% filter(entryId %in% target_class$entryId)
 wrc_entries = wrc$entryId
+
+stages_lookup_code = get_stages_lookup(stages, 'stageId', 'code')
 ```
 
 
@@ -71,11 +73,11 @@ cat("Done setup", file=logFile, sep='\n')
 ```{r  message=FALSE, echo=FALSE, error=FALSE, warning=FALSE, results='asis'}
 #stage_list=list("SS1", "SS2", "SS3", "SS4", "SS5", "SS6", "SS7", "SS8", "SS9", "SS10", "SS11", "SS12", "SS13", "SS14", "SS15", "SS16", "SS17", "SS18", "SS19", "SS20")
 stage_list=list("SS1", "SS2", "SS3", "SS4", "SS5", "SS6", "SS7", "SS8",
-                "SS9", "SS10", "SS11", "SS12", "SS13", "SS14")
-#stage_list=list("SS13")
+                "SS9", "SS10", "SS11", "SS12", "SS13", "SS14" ,"SS15",
+                "SS16", "SS17", "SS18", "SS19", "SS20")
 omit_stage_splits = c()
 
-cutoff_delta = 1500000
+cutoff_delta = -1 #1500000 # if negative ignore
 
 src = knit_expand("overall-template.Rmd")
     cat(knit_child(text=src,
@@ -83,9 +85,9 @@ src = knit_expand("overall-template.Rmd")
                  quiet=TRUE))
 ```
 
-# Loop Reports
+# Loop Reports {-}
 
-*Fortchoming... summary reports for each loop.*
+*Forthcoming... summary reports for each loop.*
 
 ```{r looper, message=FALSE, echo=FALSE, error=FALSE, warning=FALSE, results='asis'}
 
